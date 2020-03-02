@@ -14,7 +14,7 @@ class MLP(nn.Module):
       activation: (function) Activation function
       weight_init: (function) Initializes weights
     """
-    super(nn_policy_estimator, self).__init__()
+    super(MLP, self).__init__()
 
     layers = []
 
