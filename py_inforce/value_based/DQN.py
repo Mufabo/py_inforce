@@ -2,7 +2,7 @@ import torch
 
 def DQN(env, memory, q_net, t_net, optim, steps = 10000, eps = 1, disc_factor = 0.99, loss = torch.nn.MSELoss(), batch_sz = 128, tgt_update = 10, early = True,
         eps_decay = lambda eps, steps, step: eps - eps/steps,
-        act = lambda s, eps, env: torch.tensor(env.action_space.sample()) if torch.rand(1) < eps else q_net(s).max(0)[1]):
+        act = lambda s, eps, env, q_net: torch.tensor(env.action_space.sample()) if torch.rand(1) < eps else q_net(s).max(0)[1]):
     """
     Trains a neural network with Deep Q-Network algorithm
     
@@ -42,7 +42,7 @@ def DQN(env, memory, q_net, t_net, optim, steps = 10000, eps = 1, disc_factor = 
     returns = []
     s = torch.tensor(env.reset(), dtype=torch.float32)  
     for step in range(steps):      
-        a = act(s, eps, env)
+        a = act(s, eps, env, q_net)
 
         s_prime, r, done, _ = env.step(a.numpy())
         s_prime = torch.tensor(s_prime, dtype=torch.float32)
