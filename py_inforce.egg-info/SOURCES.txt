@@ -1,0 +1,8 @@
+README.md
+setup.py
+py_inforce/__init__.py
+py_inforce.egg-info/PKG-INFO
+py_inforce.egg-info/SOURCES.txt
+py_inforce.egg-info/dependency_links.txt
+py_inforce.egg-info/not-zip-safe
+py_inforce.egg-info/top_level.txt
