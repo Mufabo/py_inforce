@@ -7,3 +7,4 @@ from py_inforce.policy_based.policy_iter import policy_iteration
 
 from py_inforce.value_based.value_iter import value_iteration
 from py_inforce.value_based.DQN import DQN
+from py_inforce.value_based.Double_DQN import Double_DQN

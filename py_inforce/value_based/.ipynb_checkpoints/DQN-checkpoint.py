@@ -1,6 +1,6 @@
 import torch
 
-def DQN(env, memory, q_net, t_net, optim, steps = 10000, eps = 1, disc_factor = 0.99, loss = torch.nn.MSELoss(), batch_sz = 128, tgt_update = 10, early = True,
+def DQN(env, memory, q_net, optim, steps = 10000, eps = 1, disc_factor = 0.99, loss = torch.nn.MSELoss(), batch_sz = 128,  early = True,
         eps_decay = lambda eps, steps, step: eps - eps/steps,
         act = lambda s, eps, env, q_net: torch.tensor(env.action_space.sample()) if torch.rand(1) < eps else q_net(s).max(0)[1]):
     """
@@ -10,7 +10,6 @@ def DQN(env, memory, q_net, t_net, optim, steps = 10000, eps = 1, disc_factor = 
       env         : openai gym environment
       memory      : Memory used to store samples, import from py_inforce.Generic.Memories
       q_net       : Neural Network to train, import from py_inforce.Generic.MLP
-      t_net       : Target Net, copy of q_net
       optim       : Pytorch optimizer for q_net
       steps       : Integer, Max number of samples to collect.
                     Default = 10_000
@@ -21,7 +20,6 @@ def DQN(env, memory, q_net, t_net, optim, steps = 10000, eps = 1, disc_factor = 
       loss        : Pytorch compatible loss function
                     Default = torch.nn.MSELoss()
       batch_sz    : Int, number of samples for gradient descent
-      tgt_updat   : Int, number of samples between update of t_net
       early       : Bool, indicates if conditions for early termination should be checked. 
                     At the moment the early termination is hardwired for the CartPole-v0 environment
                     Default = True
@@ -59,9 +57,7 @@ def DQN(env, memory, q_net, t_net, optim, steps = 10000, eps = 1, disc_factor = 
             optimizer.zero_grad()
             l.backward()
             optimizer.step()
-            
-        if step % tgt_update == 0:
-            t_net.load_state_dict(q_net.state_dict())
+
         
         # Test for early break
         if early and done:
