@@ -1,6 +1,6 @@
 import torch
 
-def DQN(env, memory, q_net, t_net, optim, steps = 10000, eps = 1, disc_factor = 0.99, loss = torch.nn.MSELoss(), batch_sz = 128, tgt_update = 10, early = True,
+def Double_DQN(env, memory, q_net, t_net, optim, steps = 10000, eps = 1, disc_factor = 0.99, loss = torch.nn.MSELoss(), batch_sz = 128, tgt_update = 10, early = True,
         eps_decay = lambda eps, steps, step: eps - eps/steps,
         act = lambda s, eps, env, q_net: torch.tensor(env.action_space.sample()) if torch.rand(1) < eps else q_net(s).max(0)[1]):
     """
@@ -31,16 +31,13 @@ def DQN(env, memory, q_net, t_net, optim, steps = 10000, eps = 1, disc_factor = 
                     Default = Epsilon greedy
       
       Note:
-       Based on:
-      
-       Mnih, V., Kavukcuoglu, K., Silver, D., Rusu, A. A., Veness, J., Bellemare, M. G., Graves, A.,Riedmiller, M., Fidjeland, A. K.,   
-       Ostrovski, G. et al. (2015). Human-level control through deepreinforcement learning.Nature,518529–533.
+       Based on  	arXiv:1509.06461
     """   
     
     optimizer = optim(q_net.parameters(), lr = q_net.lr)
-    ret = 0
-    returns = []
-    s = torch.tensor(env.reset(), dtype=torch.float32)  
+
+    s = torch.tensor(env.reset(), dtype=torch.float32)
+
     for step in range(steps):      
         a = act(s, eps, env, q_net)
 
@@ -49,7 +46,7 @@ def DQN(env, memory, q_net, t_net, optim, steps = 10000, eps = 1, disc_factor = 
         eps = eps_decay(eps, steps, step)
         
         memory.push(s, a, r, s_prime, done)
-        ret += r
+
         # Optimize
         if step >= batch_sz:
             s_, a_, r_, s_p, d_ = memory.sample(batch_sz)            
@@ -78,5 +75,6 @@ def DQN(env, memory, q_net, t_net, optim, steps = 10000, eps = 1, disc_factor = 
                 break
                     
         s = torch.tensor(env.reset(), dtype=torch.float32) if done else s_prime
+
 
         

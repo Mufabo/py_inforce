@@ -1,6 +1,6 @@
 import torch
 
-def DQN(env, memory, q_net, optim, steps = 10000, eps = 1, disc_factor = 0.99, loss = torch.nn.MSELoss(), batch_sz = 128,  early = True,
+def DQN(env, memory, q_net, optim, steps = 10000, eps = 1, disc_factor = 0.99, loss = torch.nn.MSELoss(), batch_sz = 128, early = True,
         eps_decay = lambda eps, steps, step: eps - eps/steps,
         act = lambda s, eps, env, q_net: torch.tensor(env.action_space.sample()) if torch.rand(1) < eps else q_net(s).max(0)[1]):
     """
@@ -36,8 +36,7 @@ def DQN(env, memory, q_net, optim, steps = 10000, eps = 1, disc_factor = 0.99, l
     """   
     
     optimizer = optim(q_net.parameters(), lr = q_net.lr)
-    ret = 0
-    returns = []
+
     s = torch.tensor(env.reset(), dtype=torch.float32)  
     for step in range(steps):      
         a = act(s, eps, env, q_net)
@@ -47,7 +46,7 @@ def DQN(env, memory, q_net, optim, steps = 10000, eps = 1, disc_factor = 0.99, l
         eps = eps_decay(eps, steps, step)
         
         memory.push(s, a, r, s_prime, done)
-        ret += r
+
         # Optimize
         if step >= batch_sz:
             s_, a_, r_, s_p, d_ = memory.sample(batch_sz)            
@@ -57,7 +56,7 @@ def DQN(env, memory, q_net, optim, steps = 10000, eps = 1, disc_factor = 0.99, l
             optimizer.zero_grad()
             l.backward()
             optimizer.step()
-
+            
         
         # Test for early break
         if early and done:
@@ -74,5 +73,3 @@ def DQN(env, memory, q_net, optim, steps = 10000, eps = 1, disc_factor = 0.99, l
                 break
                     
         s = torch.tensor(env.reset(), dtype=torch.float32) if done else s_prime
-
-        
